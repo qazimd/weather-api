@@ -8,6 +8,9 @@ class WeatherAPI {
 
   async getCurrentWeather(city) {
     try {
+      console.log('Fetching weather for city:', city);
+      console.log('Using API key:', this.apiKey ? 'Present' : 'Missing');
+      
       const response = await axios.get(`${this.baseUrl}/weather`, {
         params: {
           q: city,
@@ -16,14 +19,10 @@ class WeatherAPI {
         }
       });
 
-      return {
-        city: response.data.name,
-        temperature: response.data.main.temp,
-        humidity: response.data.main.humidity,
-        windSpeed: response.data.wind.speed,
-        description: response.data.weather[0].description
-      };
+      console.log('Weather API response:', response.data);
+      return response.data;
     } catch (error) {
+      console.error('Weather API error:', error.response?.data || error.message);
       throw new Error(`Failed to fetch current weather: ${error.message}`);
     }
   }
@@ -38,15 +37,9 @@ class WeatherAPI {
         }
       });
 
-      return response.data.list.map(item => ({
-        city: response.data.city.name,
-        temperature: item.main.temp,
-        humidity: item.main.humidity,
-        windSpeed: item.wind.speed,
-        description: item.weather[0].description,
-        timestamp: item.dt_txt
-      }));
+      return response.data;
     } catch (error) {
+      console.error('Weather API error:', error.response?.data || error.message);
       throw new Error(`Failed to fetch forecast: ${error.message}`);
     }
   }

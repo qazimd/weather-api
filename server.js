@@ -3,8 +3,13 @@ const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const weatherRoutes = require('./src/routes/weatherRoutes');
+const authRoutes = require('./src/routes/authRoutes');
+const countryRoutes = require('./src/routes/countryRoutes');
 
 const app = express();
+
+// Trust proxy for rate limiting
+app.set('trust proxy', 1);
 
 // Middleware
 app.use(cors());
@@ -18,7 +23,9 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Routes
-app.use('/weather', weatherRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/countries', countryRoutes);
+app.use('/api/weather', weatherRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -26,7 +33,12 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-const PORT = process.env.PORT || 3000;
+// Explicitly set port to 3000 for backend
+const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Backend server is running on http://localhost:${PORT}`);
+  console.log('Available routes:');
+  console.log('- /api/auth/* - Authentication routes');
+  console.log('- /api/countries/* - Country routes');
+  console.log('- /api/weather/* - Weather data routes');
 }); 
