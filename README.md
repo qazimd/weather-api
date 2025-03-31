@@ -1,11 +1,41 @@
-# Weather Data API Service
+# Weather Application
 
-A RESTful API service that provides current weather, forecast, and historical weather data using the OpenWeatherMap API and SQLite for data storage.
+A full-stack weather application that provides current weather data for countries across different regions. The application features user authentication, region-based country selection, and detailed weather information for capital cities.
+
+## Features
+
+- User Authentication (Register/Login)
+- Region-based country selection (Europe, America, Asia, Australia)
+- Current weather data for capital cities
+- Weather history tracking
+- Responsive and modern UI
+- Secure API endpoints with JWT authentication
 
 ## Prerequisites
 
 Before running this application, make sure you have the following installed:
 - [Node.js](https://nodejs.org/) (v14 or higher)
+- [npm](https://www.npmjs.com/) (v6 or higher)
+
+## Project Structure
+
+```
+weather-api/
+├── frontend/                 # React frontend application
+│   ├── src/
+│   │   ├── components/      # Reusable React components
+│   │   ├── pages/          # Page components
+│   │   ├── data/           # Static data (regions, countries)
+│   │   └── styles.css      # Global styles
+│   └── package.json
+├── src/                     # Backend source code
+│   ├── config/             # Configuration files
+│   ├── controllers/        # Route controllers
+│   ├── routes/            # API routes
+│   ├── utils/             # Utility functions
+│   └── server.js          # Main server file
+└── package.json
+```
 
 ## Installation
 
@@ -15,71 +45,71 @@ git clone <repository-url>
 cd weather-api
 ```
 
-2. Install dependencies:
+2. Install backend dependencies:
 ```bash
 npm install
 ```
 
-3. Create a `.env` file in the root directory with the following content:
+3. Install frontend dependencies:
+```bash
+cd frontend
+npm install
+cd ..
+```
+
+4. Create a `.env` file in the root directory with the following content:
 ```plaintext
-PORT=3000
+PORT=3001
 OPENWEATHERMAP_API_KEY=your_api_key_here
+JWT_SECRET=your_jwt_secret_here
 ```
 
 ## Running the Application
 
-### Development Mode
+Start both the backend and frontend servers with a single command:
 ```bash
 npm run dev
 ```
 
-### Production Mode
-```bash
-npm start
-```
+This will start:
+- Backend server on port 3001
+- Frontend application on port 3001
 
-The server will start on port 3000 (or the port specified in your .env file). The SQLite database file (weather.db) will be automatically created in the project root directory.
-
-## Using the CLI Tool
-
-Check current weather for a city using the command line:
-```bash
-npm run weather "London"
-```
+The application will be available at http://localhost:3001.
 
 ## API Endpoints
 
-### Get Current Weather
-```bash
-GET http://localhost:3000/weather/current?city={city_name}
-```
+### Authentication
+- `POST /auth/register` - Register a new user
+- `POST /auth/login` - Login user
+- `GET /auth/verify` - Verify JWT token
 
-### Get Weather Forecast
-```bash
-GET http://localhost:3000/weather/forecast?city={city_name}
-```
+### Weather
+- `GET /weather/:countryId` - Get weather by country ID
+- `GET /weather/current` - Get current weather by city
+- `GET /weather/forecast` - Get forecast by city
+- `GET /weather/history` - Get weather history by city
 
-### Get Historical Weather Data
-```bash
-GET http://localhost:3000/weather/history?city={city_name}
-```
+### Countries
+- `GET /countries/:regionId` - Get countries by region
 
-## Example API Response
+## Database Schema
 
-```json
-{
-  "city": "London",
-  "temperature": 18.2,
-  "humidity": 72,
-  "windSpeed": 3.6,
-  "description": "scattered clouds"
-}
-```
+### Users Table
+- id (INTEGER PRIMARY KEY)
+- email (TEXT UNIQUE)
+- password (TEXT)
+- name (TEXT)
+- created_at (DATETIME)
 
-## Data Storage
+### Countries Table
+- id (INTEGER PRIMARY KEY)
+- name (TEXT)
+- capital (TEXT)
+- region_id (TEXT)
+- created_at (DATETIME)
 
-The application uses SQLite to store historical weather data. The database file (weather.db) is created automatically when you first run the application. Each weather query is stored in the `weather_history` table with the following structure:
-
+### Weather History Table
 - id (INTEGER PRIMARY KEY)
 - city (TEXT)
 - temperature (REAL)
@@ -87,6 +117,18 @@ The application uses SQLite to store historical weather data. The database file 
 - windSpeed (REAL)
 - description (TEXT)
 - timestamp (DATETIME)
+
+## Example API Response
+
+```json
+{
+  "city": "Pristina",
+  "temperature": 18.2,
+  "humidity": 72,
+  "windSpeed": 3.6,
+  "description": "scattered clouds"
+}
+```
 
 ## Troubleshooting
 
@@ -99,9 +141,15 @@ The application uses SQLite to store historical weather data. The database file 
    - Verify your OpenWeatherMap API key in .env is valid
    - Check for any error messages in the console
 
-3. **Port Already in Use**
-   - Change the PORT in .env file
-   - Check if another service is using port 3000
+3. **Authentication Issues**
+   - Ensure JWT_SECRET is set in .env
+   - Check if the token is being properly sent in the Authorization header
+   - Verify the token format: "Bearer <token>"
+
+4. **Frontend Issues**
+   - Check the browser console for any errors
+   - Verify that the backend server is running and accessible
+   - Ensure all environment variables are properly set
 
 ## Error Messages
 
@@ -112,4 +160,3 @@ The application uses SQLite to store historical weather data. The database file 
 ## Rate Limiting
 
 The API is rate-limited to 100 requests per 15 minutes per IP address to prevent abuse.
-```
